@@ -1,15 +1,16 @@
 import { prisma } from "@/lib/prisma"
 import { authOptions } from "@/lib/auth"
 import { getServerSession } from "next-auth"
-import { NextResponse } from "next/server"
+import { NextRequest, NextResponse } from "next/server"
 import cloudinary from "@/lib/cloudinary"
 
+// GET product by ID
 export async function GET(
-  req: Request,
-  { params }: { params: Promise<{ id: string }> }
+  req: NextRequest,
+  { params }: { params: Promise<{ id: string }> } // <-- must be Promise
 ) {
   try {
-    const { id } = await params
+    const { id } = await params // <-- await the promise
 
     const product = await prisma.product.findUnique({
       where: { id },
@@ -26,9 +27,10 @@ export async function GET(
   }
 }
 
+// DELETE product by ID
 export async function DELETE(
-  req: Request,
-  { params }: { params: Promise<{ id: string }> }
+  req: NextRequest,
+  { params }: { params: Promise<{ id: string }> } // <-- must be Promise
 ) {
   try {
     const session = await getServerSession(authOptions)
@@ -37,7 +39,7 @@ export async function DELETE(
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
     }
 
-    const { id } = await params
+    const { id } = await params // <-- await the promise
 
     const product = await prisma.product.findUnique({
       where: { id },
