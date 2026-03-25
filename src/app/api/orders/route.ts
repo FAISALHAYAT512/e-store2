@@ -1,10 +1,11 @@
 import { NextResponse } from "next/server"
 import { prisma } from "@/lib/prisma"
-import { auth } from "@/lib/auth"
+import { authOptions } from "@/lib/auth"
+import { getServerSession } from "next-auth"
 
 export async function POST(req: Request) {
   try {
-    const session = await auth()
+    const session = await getServerSession(authOptions)
     const body = await req.json()
 
     const {
@@ -41,7 +42,7 @@ export async function POST(req: Request) {
 
     const order = await prisma.order.create({
       data: {
-        userId: session?.user?.id || null,
+        userId: (session?.user as { id?: string })?.id || null,
         customerName,
         email,
         phone,
@@ -54,7 +55,7 @@ export async function POST(req: Request) {
         transactionId,
         paymentSenderName,
         notes,
-        orderItems: {
+        items: {
           create: items.map((item: any) => ({
             productId: item.id,
             quantity: Number(item.quantity),
